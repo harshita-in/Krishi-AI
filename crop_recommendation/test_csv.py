@@ -16,7 +16,7 @@ print("Model loaded successfully!\n")
 
 # 2. Load the CSV file containing the test data
 # (Ensure your CSV file is in the same directory, or update the filename/path below)
-csv_file_path = os.path.join(script_dir, "Crop_recommendation.csv")
+csv_file_path = os.path.join(script_dir, "Test_case.csv")
 
 if not os.path.exists(csv_file_path):
     print(f"Error: CSV file not found at '{csv_file_path}'. Please place your CSV file in the project folder.")
