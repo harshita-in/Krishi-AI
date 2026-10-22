@@ -1,14 +1,29 @@
 import os
 import joblib
-import kagglehub
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 
-# 1. Download dataset using kagglehub
-path = kagglehub.dataset_download("atharvaingle/crop-recommendation-dataset")
-print("Path to dataset files:", path)
+# 1. Locate the dataset in the local KaggleHub cache
+kagglehub_cache = r"C:\Users\shrey\.cache\kagglehub\datasets"
+dataset_root = os.path.join(
+    kagglehub_cache,
+    "atharvaingle",
+    "crop-recommendation-dataset",
+    "versions",
+)
+versions = [
+    os.path.join(dataset_root, version)
+    for version in os.listdir(dataset_root)
+    if os.path.isdir(os.path.join(dataset_root, version))
+]
+if not versions:
+    raise FileNotFoundError(
+        f"No cached crop recommendation dataset found under '{dataset_root}'."
+    )
+path = max(versions, key=os.path.getmtime)
+print("Using cached dataset:", path)
 
 # 2. Locate the CSV file dynamically (passing 'path' to os.walk)
 csv_file_path = None
@@ -19,6 +34,9 @@ for root, dirs, files in os.walk(path):
             break
 
 print(f"Dataset file found at: {csv_file_path}")
+
+if csv_file_path is None:
+    raise FileNotFoundError(f"No CSV file found in cached dataset '{path}'.")
 
 # 3. Load the dataset using pandas
 df = pd.read_csv(csv_file_path)
