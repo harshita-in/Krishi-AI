@@ -1,0 +1,47 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #203126;
+  background: #edf5ee;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.app-shell { width: min(880px, 100%); height: min(760px, calc(100vh - 48px)); min-height: 520px; display: flex; flex-direction: column; background: #fff; border: 1px solid #d8e7d9; border-radius: 22px; box-shadow: 0 18px 50px #234b2d1c; overflow: hidden; }
+.app-header { display: flex; align-items: center; gap: 13px; padding: 20px 24px; color: #fff; background: linear-gradient(120deg, #216b3a, #4b9b4b); }
+.brand-mark, .avatar { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border-radius: 50%; font-weight: 800; color: #24623a; background: #f6d77a; }
+.app-header h1 { margin: 0; font-size: 1.35rem; }
+.app-header p { margin: 3px 0 0; opacity: .82; font-size: .88rem; }
+.status { margin-left: auto; font-size: .82rem; opacity: .9; }
+.status i { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: #b9f3a5; }
+.messages { flex: 1; overflow-y: auto; padding: 26px; }
+.message { display: flex; gap: 11px; max-width: 80%; margin-bottom: 20px; }
+.user-message { margin-left: auto; flex-direction: row-reverse; }
+.user-message .avatar { background: #d8edda; color: #216b3a; }
+.bubble { padding: 13px 16px; border-radius: 5px 17px 17px 17px; background: #f0f7f0; line-height: 1.5; white-space: pre-wrap; }
+.bubble p { margin: 5px 0 0; }
+.bubble p:first-child { margin-top: 0; }
+.bubble p:last-child { margin-bottom: 0; }
+.bubble h1, .bubble h2, .bubble h3 { margin: 0 0 8px; line-height: 1.25; }
+.bubble h1 { font-size: 1.2rem; }
+.bubble h2 { font-size: 1.08rem; }
+.bubble h3 { font-size: 1rem; }
+.bubble ul { margin: 7px 0; padding-left: 20px; }
+.bubble li { margin: 3px 0; }
+.bubble code { padding: 2px 5px; border-radius: 4px; color: #265a35; background: #dcecdf; font-family: Consolas, monospace; font-size: .88em; }
+.bubble pre { overflow-x: auto; margin: 8px 0; padding: 10px; border-radius: 8px; color: #e8f4e9; background: #1e3022; white-space: pre-wrap; }
+.bubble pre code { padding: 0; color: inherit; background: transparent; }
+.user-message .bubble { border-radius: 17px 5px 17px 17px; color: #fff; background: #347e42; }
+.composer { display: flex; gap: 10px; padding: 17px 20px 10px; border-top: 1px solid #e1ece2; }
+.composer input[type="text"], .composer input:not([type]) { min-width: 0; }
+#message-input { flex: 1; border: 1px solid #cbdccc; border-radius: 12px; padding: 13px 15px; outline: none; font: inherit; }
+#message-input:focus { border-color: #4b9b4b; box-shadow: 0 0 0 3px #4b9b4b22; }
+button, .upload-button { border: 0; border-radius: 11px; padding: 0 18px; display: grid; place-items: center; cursor: pointer; font-weight: 700; }
+button { color: #fff; background: #28733b; }
+button:disabled { opacity: .55; cursor: wait; }
+.upload-button { width: 45px; padding: 0; color: #28733b; background: #edf6ee; font-size: 1.15rem; }
+.upload-button input { display: none; }
+.hint { margin: 0; padding: 0 20px 17px; color: #78907d; font-size: .78rem; text-align: center; }
+.attachment { margin: 0 20px; padding: 7px 10px; border-radius: 8px; color: #41634a; background: #f1f8f1; font-size: .82rem; }
+.hidden { display: none; }
+.typing { color: #6e8b74; font-style: italic; }
+@media (max-width: 600px) { body { padding: 0; } .app-shell { height: 100vh; min-height: 100vh; border: 0; border-radius: 0; } .message { max-width: 92%; } }

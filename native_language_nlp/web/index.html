@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Krishi AI</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div class="brand-mark">K</div>
+      <div>
+        <h1>Krishi AI</h1>
+        <p>Your intelligent farming companion</p>
+      </div>
+      <span class="status"><i></i> Online</span>
+    </header>
+
+    <section id="messages" class="messages" aria-live="polite">
+      <div class="message bot-message">
+        <div class="avatar">K</div>
+        <div class="bubble">
+          <strong>Namaste! I’m Krishi AI.</strong>
+          <p>Ask me about crop recommendations, crop prices, plant diseases, or farming advice.</p>
+        </div>
+      </div>
+    </section>
+
+    <div id="attachment" class="attachment hidden"></div>
+    <form id="chat-form" class="composer">
+      <label class="upload-button" title="Attach a plant image">
+        <input id="image-input" type="file" accept="image/*">
+        <span>📎</span>
+      </label>
+      <input id="message-input" autocomplete="off" placeholder="Ask Krishi AI anything..." aria-label="Message">
+      <button id="send-button" type="submit">Send</button>
+    </form>
+    <p class="hint">Attach a plant image when asking for disease detection.</p>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
