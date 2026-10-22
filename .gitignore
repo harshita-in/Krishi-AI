@@ -500,3 +500,5 @@ venv.bak/
 *.swo
 .DS_Store
 Thumbs.db
+.keras
+*.keras
