@@ -4,7 +4,7 @@ import pandas as pd
 
 # 1. Locate and load the saved model using relative paths
 script_dir = os.path.dirname(os.path.abspath(__file__))
-model_filename = os.path.join(script_dir, "crop_recommendation_model.pkl")
+model_filename = os.path.join(script_dir, "..", "model", "crop_recommendation_model.pkl")
 
 if not os.path.exists(model_filename):
     print(f"Error: Model not found at '{model_filename}'. Please run your training script first!")

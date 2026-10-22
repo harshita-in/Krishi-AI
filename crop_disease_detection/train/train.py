@@ -135,7 +135,7 @@ history = model.fit(
 
 # Save the trained model safely using a relative path
 script_dir = os.path.dirname(os.path.abspath(__file__))
-save_dir = os.path.join(script_dir, "models")
+save_dir = os.path.join(script_dir, "..", "model")
 os.makedirs(save_dir, exist_ok=True)
 model_path = os.path.join(save_dir, "crop_disease_cnn_model.keras")
 

@@ -57,8 +57,8 @@ predicted_crop = rf_model.predict(new_sample)
 print(f"\nRecommended Crop for the given soil/weather conditions: **{predicted_crop[0].upper()}**")
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
-
-# Combine directory and filename
-model_filename = os.path.join(script_directory, "crop_recommendation_model.pkl")
+model_directory = os.path.join(script_directory, "..", "model")
+os.makedirs(model_directory, exist_ok=True)
+model_filename = os.path.join(model_directory, "crop_recommendation_model.pkl")
 joblib.dump(rf_model, model_filename)
 print(f"Model successfully saved at: {model_filename}")

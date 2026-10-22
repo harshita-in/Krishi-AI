@@ -1,4 +1,7 @@
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'   # Hides ALL logs (Info, Warnings, Errors)
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Optional: Turns off the oneDNN notice
+
 import numpy as np
 import tensorflow as tf
 import kagglehub
@@ -7,7 +10,7 @@ import kagglehub
 # 1. Load the Saved CNN Model
 # ==========================================
 script_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(script_dir, "models", "crop_disease_cnn_model.keras")
+model_path = os.path.join(script_dir, "..", "model", "crop_disease_cnn_model.keras")
 
 if not os.path.exists(model_path):
     print(f"Error: Model not found at '{model_path}'. Please train and save your CNN model first!")
