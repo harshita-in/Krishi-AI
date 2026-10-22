@@ -5,7 +5,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Optional: Turns off the oneDNN noti
 import numpy as np
 import tensorflow as tf
 import kagglehub
-import cv2
+from tkinter import Tk, filedialog
 
 # ==========================================
 # 1. Load the Saved CNN Model
@@ -45,61 +45,68 @@ print(f"Successfully loaded {len(class_names)} class labels.\n")
 
 
 # ==========================================
-# 3. Preprocess and Predict a Camera Frame
+# 3. Select a Test Image from Local Storage
 # ==========================================
-IMG_SIZE = 128
-def predict_frame(frame):
-    """Resize and normalize a BGR camera frame before classifying it."""
-    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
-    input_arr = np.expand_dims(image.astype(np.float32) / 255.0, axis=0)
-
-    predictions = model.predict(input_arr, verbose=0)
-    predicted_class_index = int(np.argmax(predictions[0]))
-    predicted_disease = class_names[predicted_class_index]
-    confidence_score = float(np.max(predictions[0])) * 100
-    return predicted_disease, confidence_score
-
-
-# ==========================================
-# 4. Capture and Process Images in Real Time
-# ==========================================
-camera = cv2.VideoCapture(0)
-if not camera.isOpened():
-    print("Error: Could not open the camera. Check that it is connected and available.")
-    raise SystemExit(1)
-
-print("Camera started.")
-print("Press SPACE to classify the current image; press Q to quit.")
-result_text = "Press SPACE to classify"
+print("Please select a leaf image from your computer...")
+file_picker = Tk()
+file_picker.withdraw()
+file_picker.attributes("-topmost", True)
 
 try:
-    while True:
-        success, frame = camera.read()
-        if not success:
-            print("Error: Could not read a frame from the camera.")
-            break
-
-        display_frame = frame.copy()
-        cv2.putText(
-            display_frame,
-            result_text,
-            (10, 30),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.7,
-            (0, 255, 0),
-            2,
-        )
-        cv2.imshow("Crop Disease Detection", display_frame)
-
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord("q"):
-            break
-        if key == ord(" "):
-            predicted_disease, confidence_score = predict_frame(frame)
-            result_text = f"{predicted_disease} ({confidence_score:.2f}%)"
-            print(f"Predicted Disease/Status: {predicted_disease}")
-            print(f"Confidence Score: {confidence_score:.2f}%")
+    test_image_path = filedialog.askopenfilename(
+        title="Select a leaf image",
+        filetypes=[
+            ("Image files", "*.jpg *.jpeg *.png *.bmp *.gif *.JPG *.JPEG *.PNG"),
+            ("All files", "*.*"),
+        ],
+    )
 finally:
-    camera.release()
-    cv2.destroyAllWindows()
+    file_picker.destroy()
+
+if not test_image_path:
+    print("No image selected. Prediction cancelled.")
+    exit()
+
+if not os.path.isfile(test_image_path):
+    print(f"Error: Selected image file was not found at '{test_image_path}'.")
+    exit()
+
+
+# ==========================================
+# 4. Preprocess the Single Image
+# ==========================================
+IMG_SIZE = 128
+print(f"Processing image: {test_image_path}")
+
+# Load image and resize it to 128x128 pixels (the size used during training)
+image = tf.keras.utils.load_img(test_image_path, target_size=(IMG_SIZE, IMG_SIZE))
+
+# Convert image into a numerical array
+input_arr = tf.keras.utils.img_to_array(image)
+
+# Expand dimensions to create a batch of 1 (Model expects shape: [1, 128, 128, 3])
+input_arr = np.array([input_arr])
+
+# Normalize pixel values from [0, 255] down to [0.0, 1.0]
+input_arr = input_arr / 255.0
+
+
+# ==========================================
+# 5. Make Prediction
+# ==========================================
+print("Running prediction...")
+predictions = model.predict(input_arr)
+
+# Find the index of the highest probability
+predicted_class_index = np.argmax(predictions[0])
+predicted_crop_disease = class_names[predicted_class_index]
+confidence_score = float(np.max(predictions[0])) * 100
+
+
+# ==========================================
+# 6. Display Results
+# ==========================================
+print("\n========================================")
+print(f" 🌱 Predicted Disease/Status : {predicted_crop_disease}")
+print(f" 📊 Confidence Score          : {confidence_score:.2f}%")
+print("========================================")
