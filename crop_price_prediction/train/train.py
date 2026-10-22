@@ -62,7 +62,9 @@ if missing_columns:
     )
 
 # Quick preprocessing: Handle dates and missing values
-df['Price Date'] = pd.to_datetime(df['Price Date'], errors='coerce')
+df['Price Date'] = pd.to_datetime(
+    df['Price Date'], format='mixed', errors='coerce'
+)
 df['Year'] = df['Price Date'].dt.year
 df['Month'] = df['Price Date'].dt.month
 df['Day'] = df['Price Date'].dt.day
