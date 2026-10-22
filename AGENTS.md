@@ -20,7 +20,7 @@ Krishi AI is a Windows-based agriculture project with three local models and a G
 - Keep API keys and credentials in the root `.env` file.
 - Never commit `.env`, model secrets, downloaded datasets, or credentials.
 - Preserve the existing model file locations under each project’s `model` directory.
-- Keep frontend assets under `native_language_nlp\web`.
+- Keep frontend assets under `web`.
 - Keep the web-server entry point at the repository root as `server.py`.
 
 ## Dataset conventions
@@ -75,4 +75,3 @@ For chatbot changes, verify that:
 4. Local model files are found at their documented paths.
 
 Do not run full model training unless it is necessary to validate the requested change.
-

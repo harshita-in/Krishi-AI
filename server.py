@@ -5,11 +5,10 @@ import tempfile
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 from native_language_nlp.groq import create_groq_client, load_dotenv, chat_response
-from huggingface_hub import InferenceClient
 
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
-WEB_DIR = os.path.join(PROJECT_DIR, "native_language_nlp", "web")
+WEB_DIR = os.path.join(PROJECT_DIR, "web")
 load_dotenv(os.path.join(PROJECT_DIR, ".env"))
 
 
@@ -28,15 +27,8 @@ class ChatHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _send_audio(self, status, audio):
-        self.send_response(status)
-        self.send_header("Content-Type", "audio/wav")
-        self.send_header("Content-Length", str(len(audio)))
-        self.end_headers()
-        self.wfile.write(audio)
-
     def do_POST(self):
-        if self.path not in {"/api/chat", "/api/tts"}:
+        if self.path != "/api/chat":
             self._send_json(404, {"error": "Endpoint not found."})
             return
 
@@ -44,21 +36,6 @@ class ChatHandler(SimpleHTTPRequestHandler):
         try:
             length = int(self.headers.get("Content-Length", "0"))
             request = json.loads(self.rfile.read(length))
-
-            if self.path == "/api/tts":
-                text = str(request.get("text", "")).strip()
-                if not text:
-                    raise ValueError("Text for speech cannot be empty.")
-                hf_token = os.getenv("HF_TOKEN")
-                if not hf_token:
-                    raise RuntimeError("HF_TOKEN is not set in the project .env file.")
-                client = InferenceClient(provider="fal-ai", token=hf_token)
-                audio = client.text_to_speech(
-                    text,
-                    model=os.getenv("HF_TTS_MODEL", "hexgrad/Kokoro-82M"),
-                )
-                self._send_audio(200, audio)
-                return
 
             message = str(request.get("message", "")).strip()
             if not message:

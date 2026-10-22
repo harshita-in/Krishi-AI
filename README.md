@@ -30,8 +30,6 @@ Create or edit the root `.env` file:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
-HF_TOKEN=your_huggingface_token
-HF_TTS_MODEL=hexgrad/Kokoro-82M
 ```
 
 The `.env` file is ignored by Git. Never commit API keys or other credentials.
@@ -52,11 +50,8 @@ The chatbot can:
 - Route crop-recommendation requests to the local recommendation model.
 - Route price-prediction requests to the local CatBoost model.
 - Accept a plant image and route disease detection to the local CNN model.
-- Read assistant responses aloud with Hugging Face text-to-speech.
 
 For disease detection, attach an image using the paperclip button in the web interface.
-Use the speaker button on an assistant message to request audio. The Hugging Face
-token stays on the Python server and is never sent to the browser.
 
 ## Model training
 
@@ -152,10 +147,10 @@ The current production chatbot uses Groq instead of MiniGPT.
 server.py                         Root web-server entry point
 native_language_nlp/
   groq.py                         Groq routing and local-model integration
-  web/
-    index.html                    Chatbot page
-    styles.css                    Chatbot styling
-    app.js                        Browser interaction and Markdown rendering
+web/
+  index.html                      Chatbot page
+  styles.css                      Chatbot styling
+  app.js                          Browser interaction and Markdown rendering
 crop_recommendation/
   model/                          Saved recommendation model
   train/                          Recommendation training script
