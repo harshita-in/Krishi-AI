@@ -14,8 +14,40 @@ function addMessage(text, role) {
   const bubble = wrapper.querySelector(".bubble");
   if (role === "bot") {
     bubble.innerHTML = renderMarkdown(text);
+    const speakButton = document.createElement("button");
+    speakButton.className = "speak-button";
+    speakButton.type = "button";
+    speakButton.title = "Read response aloud";
+    speakButton.textContent = "🔊";
+    speakButton.addEventListener("click", () => speakResponse(text, speakButton));
+    bubble.appendChild(speakButton);
   } else {
     bubble.textContent = text;
+  }
+
+  async function speakResponse(text, button) {
+    button.disabled = true;
+    button.textContent = "…";
+    try {
+      const response = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || "Text-to-speech failed.");
+      }
+      const audioUrl = URL.createObjectURL(await response.blob());
+      const audio = new Audio(audioUrl);
+      audio.addEventListener("ended", () => URL.revokeObjectURL(audioUrl), { once: true });
+      await audio.play();
+    } catch (error) {
+      addMessage(`Audio error: ${error.message}`, "bot");
+    } finally {
+      button.disabled = false;
+      button.textContent = "🔊";
+    }
   }
   messages.appendChild(wrapper);
   messages.scrollTop = messages.scrollHeight;
