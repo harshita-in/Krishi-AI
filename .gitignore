@@ -502,3 +502,4 @@ venv.bak/
 Thumbs.db
 .keras
 *.keras
+sample.py
