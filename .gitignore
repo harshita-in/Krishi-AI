@@ -503,3 +503,4 @@ Thumbs.db
 .keras
 *.keras
 sample.py
+catboost_info/
