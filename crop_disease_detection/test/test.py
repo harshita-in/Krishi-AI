@@ -5,6 +5,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Optional: Turns off the oneDNN noti
 import numpy as np
 import tensorflow as tf
 import kagglehub
+import cv2
 
 # ==========================================
 # 1. Load the Saved CNN Model
@@ -44,52 +45,61 @@ print(f"Successfully loaded {len(class_names)} class labels.\n")
 
 
 # ==========================================
-# 3. Specify Your Test Image Path
-# ==========================================
-# Put the path to any leaf image on your computer here
-test_image_path = r"C:\Users\shrey\Desktop\Krishi-AI\sample_leaf.JPG"
-
-if not os.path.exists(test_image_path):
-    print(f"❌ Error: Image file not found at '{test_image_path}'.")
-    print("👉 Please save a leaf image locally and update the 'test_image_path' variable in this script.")
-    exit()
-
-
-# ==========================================
-# 4. Preprocess the Single Image
+# 3. Preprocess and Predict a Camera Frame
 # ==========================================
 IMG_SIZE = 128
-print(f"Processing image: {test_image_path}")
+def predict_frame(frame):
+    """Resize and normalize a BGR camera frame before classifying it."""
+    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
+    input_arr = np.expand_dims(image.astype(np.float32) / 255.0, axis=0)
 
-# Load image and resize it to 128x128 pixels (the size used during training)
-image = tf.keras.utils.load_img(test_image_path, target_size=(IMG_SIZE, IMG_SIZE))
-
-# Convert image into a numerical array
-input_arr = tf.keras.utils.img_to_array(image)
-
-# Expand dimensions to create a batch of 1 (Model expects shape: [1, 128, 128, 3])
-input_arr = np.array([input_arr]) 
-
-# Normalize pixel values from [0, 255] down to [0.0, 1.0]
-input_arr = input_arr / 255.0
+    predictions = model.predict(input_arr, verbose=0)
+    predicted_class_index = int(np.argmax(predictions[0]))
+    predicted_disease = class_names[predicted_class_index]
+    confidence_score = float(np.max(predictions[0])) * 100
+    return predicted_disease, confidence_score
 
 
 # ==========================================
-# 5. Make Prediction
+# 4. Capture and Process Images in Real Time
 # ==========================================
-print("Running prediction...")
-predictions = model.predict(input_arr)
+camera = cv2.VideoCapture(0)
+if not camera.isOpened():
+    print("Error: Could not open the camera. Check that it is connected and available.")
+    raise SystemExit(1)
 
-# Find the index of the highest probability
-predicted_class_index = np.argmax(predictions[0])
-predicted_crop_disease = class_names[predicted_class_index]
-confidence_score = float(np.max(predictions[0])) * 100
+print("Camera started.")
+print("Press SPACE to classify the current image; press Q to quit.")
+result_text = "Press SPACE to classify"
 
+try:
+    while True:
+        success, frame = camera.read()
+        if not success:
+            print("Error: Could not read a frame from the camera.")
+            break
 
-# ==========================================
-# 6. Display Results
-# ==========================================
-print("\n========================================")
-print(f" 🌱 Predicted Disease/Status : {predicted_crop_disease}")
-print(f" 📊 Confidence Score          : {confidence_score:.2f}%")
-print("========================================")
+        display_frame = frame.copy()
+        cv2.putText(
+            display_frame,
+            result_text,
+            (10, 30),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.7,
+            (0, 255, 0),
+            2,
+        )
+        cv2.imshow("Crop Disease Detection", display_frame)
+
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q"):
+            break
+        if key == ord(" "):
+            predicted_disease, confidence_score = predict_frame(frame)
+            result_text = f"{predicted_disease} ({confidence_score:.2f}%)"
+            print(f"Predicted Disease/Status: {predicted_disease}")
+            print(f"Confidence Score: {confidence_score:.2f}%")
+finally:
+    camera.release()
+    cv2.destroyAllWindows()
