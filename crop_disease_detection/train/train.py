@@ -1,14 +1,28 @@
 import os
-import kagglehub
 import tensorflow as tf
 from tensorflow.keras import layers, models
 
 # ==========================================
-# STEP 1: Download & Locate Dataset
+# STEP 1: Locate Dataset in the Local KaggleHub Cache
 # ==========================================
-print("Downloading Plant Disease Dataset via kagglehub...")
-path = kagglehub.dataset_download("vipoooool/new-plant-diseases-dataset")
-print("Dataset downloaded to:", path)
+kagglehub_cache = r"C:\Users\shrey\.cache\kagglehub\datasets"
+dataset_root = os.path.join(
+    kagglehub_cache,
+    "vipoooool",
+    "new-plant-diseases-dataset",
+    "versions",
+)
+versions = [
+    os.path.join(dataset_root, version)
+    for version in os.listdir(dataset_root)
+    if os.path.isdir(os.path.join(dataset_root, version))
+]
+if not versions:
+    raise FileNotFoundError(
+        f"No cached plant disease dataset found under '{dataset_root}'."
+    )
+path = max(versions, key=os.path.getmtime)
+print("Using cached dataset:", path)
 
 # Dynamically locate 'train' and 'valid' folders inside the downloaded path
 train_dir, valid_dir = None, None
@@ -28,6 +42,11 @@ if not train_dir or not valid_dir:
 
 print(f"Train Directory Found: {train_dir}")
 print(f"Validation Directory Found: {valid_dir}")
+
+if not train_dir or not valid_dir:
+    raise FileNotFoundError(
+        f"Cached dataset '{path}' must contain both 'train' and 'valid' directories."
+    )
 
 
 # ==========================================

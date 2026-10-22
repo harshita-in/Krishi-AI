@@ -1,23 +1,30 @@
 import pandas as pd
 import numpy as np
 import os
-import sys
-import kagglehub
 from catboost import CatBoostRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, r2_score
 
-# Use an optional command-line argument for a local dataset directory.
-# Otherwise, download the dataset configured by the project.
+# Locate the dataset in the local KaggleHub cache.
 script_dir = os.path.dirname(os.path.abspath(__file__))
-if len(sys.argv) > 1:
-    dataset_path = sys.argv[1]
-else:
-    print("Downloading agricultural mandi prices dataset...")
-    dataset_path = kagglehub.dataset_download(
-        "arjunyadav99/indian-agricultural-mandi-prices-20232025"
+kagglehub_cache = r"C:\Users\shrey\.cache\kagglehub\datasets"
+dataset_root = os.path.join(
+    kagglehub_cache,
+    "arjunyadav99",
+    "indian-agricultural-mandi-prices-20232025",
+    "versions",
+)
+versions = [
+    os.path.join(dataset_root, version)
+    for version in os.listdir(dataset_root)
+    if os.path.isdir(os.path.join(dataset_root, version))
+]
+if not versions:
+    raise FileNotFoundError(
+        f"No cached agricultural price dataset found under '{dataset_root}'."
     )
-    print(f"Dataset downloaded to: {dataset_path}")
+dataset_path = max(versions, key=os.path.getmtime)
+print(f"Using cached dataset: {dataset_path}")
 
 csv_files = [
     os.path.join(root, file)
@@ -29,7 +36,7 @@ csv_files = [
 if not csv_files:
     raise FileNotFoundError(
         f"No CSV dataset found in '{dataset_path}'. "
-        "Place the dataset there or pass its directory as the first argument."
+        "Place the dataset in the local KaggleHub cache."
     )
 
 df = pd.read_csv(csv_files[0])
