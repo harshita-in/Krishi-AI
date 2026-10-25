@@ -504,5 +504,6 @@ Thumbs.db
 *.keras
 sample.py
 catboost_info/
+server.js
 *.safetensors
 *.gguf
