@@ -23,14 +23,18 @@ def get_local_model_and_tokenizer():
     global _LOCAL_MODEL, _LOCAL_TOKENIZER
     if _LOCAL_MODEL is None or _LOCAL_TOKENIZER is None:
         model_path = os.getenv("LOCAL_NLP_MODEL")
-        if not model_path:
+        if not model_path or not os.path.isdir(model_path):
             model_path = LOCAL_MODEL_DIR if os.path.isdir(LOCAL_MODEL_DIR) else DEFAULT_LOCAL_MODEL_NAME
 
-        _LOCAL_TOKENIZER = AutoTokenizer.from_pretrained(model_path)
+        is_local_dir = os.path.isdir(model_path)
+        _LOCAL_TOKENIZER = AutoTokenizer.from_pretrained(
+            model_path, local_files_only=is_local_dir
+        )
         _LOCAL_MODEL = AutoModelForCausalLM.from_pretrained(
             model_path,
             dtype=torch.float32,
             device_map="cpu",
+            local_files_only=is_local_dir,
         )
     return _LOCAL_MODEL, _LOCAL_TOKENIZER
 
